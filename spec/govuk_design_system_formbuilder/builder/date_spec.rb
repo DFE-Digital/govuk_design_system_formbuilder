@@ -14,9 +14,9 @@ describe GOVUKDesignSystemFormBuilder::FormBuilder do
     let(:year_multiparam_attribute) { '1i' }
     let(:multiparam_attributes) { [day_multiparam_attribute, month_multiparam_attribute, year_multiparam_attribute] }
 
-    let(:day_identifier) { "person_born_on_#{day_multiparam_attribute}" }
-    let(:month_identifier) { "person_born_on_#{month_multiparam_attribute}" }
-    let(:year_identifier) { "person_born_on_#{year_multiparam_attribute}" }
+    let(:day_identifier) { "person-born-on-#{day_multiparam_attribute}-field" }
+    let(:month_identifier) { "person-born-on-#{month_multiparam_attribute}-field" }
+    let(:year_identifier) { "person-born-on-#{year_multiparam_attribute}-field" }
 
     let(:args) { [method, attribute] }
     subject { builder.send(*args) }

@@ -931,6 +931,8 @@ module GOVUKDesignSystemFormBuilder
     # @param link_base_errors_to [Symbol,String] set the field that errors on +:base+ are linked
     #   to, as there won't be a field representing the object base.
     # @option kwargs [Hash] kwargs additional arguments are applied as attributes to the error summary +div+ element
+    # @param block [Block] arbitrary HTML that will be appended to the errors list. If anything is passed in
+    #   the error summary will be displayed, regardless of whether there are any errors present on the object itself
     #
     # @note Only the first error in the +#errors+ array for each attribute will
     #   be included.
@@ -939,8 +941,8 @@ module GOVUKDesignSystemFormBuilder
     #   = f.govuk_error_summary 'Uh-oh, spaghettios'
     #
     # @see https://design-system.service.gov.uk/components/error-summary/ GOV.UK error summary
-    def govuk_error_summary(title = config.default_error_summary_title, link_base_errors_to: nil, **kwargs)
-      Elements::ErrorSummary.new(self, object_name, title, link_base_errors_to: link_base_errors_to, **kwargs).html
+    def govuk_error_summary(title = config.default_error_summary_title, link_base_errors_to: nil, **kwargs, &block)
+      Elements::ErrorSummary.new(self, object_name, title, link_base_errors_to: link_base_errors_to, **kwargs, &block).html
     end
 
     # Generates a fieldset containing the contents of the block
@@ -957,6 +959,7 @@ module GOVUKDesignSystemFormBuilder
     # @option caption size [String] the size of the caption, can be +xl+, +l+ or +m+. Defaults to +m+
     # @option caption kwargs [Hash] additional arguments are applied as attributes on the caption +span+ element
     # @option kwargs [Hash] kwargs additional arguments are applied as attributes to the +input+ element
+    # @param block [Block] arbitrary HTML that will form the fieldset's content
     #
     # @example A fieldset containing address fields
     #   = f.govuk_fieldset legend: { text: 'Address' } do

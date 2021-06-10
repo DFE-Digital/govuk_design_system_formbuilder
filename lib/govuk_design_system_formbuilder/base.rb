@@ -17,6 +17,13 @@ module GOVUKDesignSystemFormBuilder
 
     # returns the id value used for the input
     #
+    # @param link_errors [Boolean] toggles whether or not the id will be generated in the normal
+    #   manner or replaced with the special error style when the attribute has an error on the
+    #   field. It's used when fields that have more than one input (dates, radios, checkboxes)
+    #   don't end up with duplicate (or no) ids by allowing a specific input to be targetted.
+    # @param segment [String] used when generating date field inputs ids, accepts +day+,
+    #   +month+ or +year+.
+    #
     # @note field_id is overridden so that the error summary can link to the
     #   correct element.
     #
@@ -28,11 +35,11 @@ module GOVUKDesignSystemFormBuilder
     # @return [String] the element's +id+
     # @see https://design-system.service.gov.uk/components/error-summary/#linking-from-the-error-summary-to-each-answer
     #   GOV.UK linking to elements from the error summary
-    def field_id(link_errors: false)
+    def field_id(link_errors: false, segment: nil)
       if link_errors && has_errors?
         build_id('field-error', include_value: false)
       else
-        build_id('field')
+        build_id('field', segment: segment)
       end
     end
 
@@ -74,15 +81,11 @@ module GOVUKDesignSystemFormBuilder
     #
     # @example
     #   build_id('hint') #=> "person-name-hint"
-    def build_id(id_type, delimiter = '-', replace = '_', attribute_name: nil, include_value: true)
+    def build_id(id_type, delimiter = '-', replace = '_', segment: nil, attribute_name: nil, include_value: true)
       attribute = attribute_name || @attribute_name
-      value     = include_value && @value || nil
-      [
-        @object_name,
-        attribute,
-        value,
-        id_type
-      ]
+      value     = (include_value && @value) || nil
+
+      [@object_name, attribute, segment, value, id_type]
         .compact
         .join(delimiter)
         .parameterize

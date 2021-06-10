@@ -125,10 +125,12 @@ module GOVUKDesignSystemFormBuilder
       # be able to link to the day field. Otherwise, generate IDs
       # in the normal fashion
       def id(segment, link_errors)
+        segment_identifier = SEGMENTS.fetch(segment)
+
         if has_errors? && link_errors
           field_id(link_errors: link_errors)
         else
-          [@object_name, @attribute_name, SEGMENTS.fetch(segment)].join("_")
+          field_id(segment: segment_identifier)
         end
       end
 

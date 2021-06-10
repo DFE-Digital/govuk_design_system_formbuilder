@@ -37,7 +37,7 @@ describe GOVUKDesignSystemFormBuilder::FormBuilder do
       end
 
       describe 'error messages' do
-        subject! { builder.send(method) }
+        subject! { builder.send(*args) }
 
         context 'there are multiple errors each with one error message' do
           let(:object) { Person.new(favourite_colour: nil, projects: []) }
@@ -295,9 +295,49 @@ describe GOVUKDesignSystemFormBuilder::FormBuilder do
       end
     end
 
+    describe 'custom error messages' do
+      let(:errors) do
+        { "Error one" => "#field-one", "Error two" => "#field-two" }
+      end
+
+      subject do
+        builder.send(*args) do
+          builder.safe_join(errors.map { |text, id| builder.tag.li(builder.tag.a(text, href: id)) })
+        end
+      end
+
+      context 'when the object is invalid' do
+        before { object.valid? }
+
+        specify 'renders the errors from the object' do
+          expect(subject).to have_tag('li') do
+            with_tag('a', text: 'Choose a favourite colour')
+          end
+        end
+
+        specify 'renders the custom errors' do
+          expect(subject).to have_tag('li') do
+            errors.each { |name, id| with_tag('a', text: name, with: { href: id }) }
+          end
+        end
+      end
+
+      context 'when the object is valid' do
+        specify 'does not render any errors from the object' do
+          expect(subject).to have_tag('li', count: errors.size)
+        end
+
+        specify 'renders the custom errors' do
+          expect(subject).to have_tag('li') do
+            errors.each { |name, id| with_tag('a', text: name, with: { href: id }) }
+          end
+        end
+      end
+    end
+
     context 'when the object has no errors' do
       let(:object) { Person.valid_example }
-      subject { builder.send(method) }
+      subject { builder.send(*args) }
 
       specify 'no error summary should be present' do
         expect(subject).to be_nil
@@ -306,7 +346,7 @@ describe GOVUKDesignSystemFormBuilder::FormBuilder do
 
     context 'when the object does not support errors' do
       let(:object) { Guest.example }
-      subject { builder.send(method) }
+      subject { builder.send(*args) }
 
       specify 'an error should be raised' do
         expect { subject }.to raise_error(NoMethodError, /errors/)
@@ -319,7 +359,7 @@ describe GOVUKDesignSystemFormBuilder::FormBuilder do
 
       context 'when an override is specified' do
         let(:link_base_errors_to) { :name }
-        subject { builder.send(method, link_base_errors_to: link_base_errors_to) }
+        subject { builder.send(*args, link_base_errors_to: link_base_errors_to) }
 
         specify 'the override field should be linked to' do
           expect(subject).to have_tag("a", text: error, with: { href: %(#person-#{link_base_errors_to}-field) })
@@ -327,7 +367,7 @@ describe GOVUKDesignSystemFormBuilder::FormBuilder do
       end
 
       context 'when no override is specified' do
-        subject { builder.send(method) }
+        subject { builder.send(*args) }
 
         specify 'the base field should be linked to' do
           expect(subject).to have_tag("a", text: error, with: { href: %(#person-base-field-error) })
